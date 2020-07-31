@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:nyxx/nyxx.dart';
 
 import 'AST.dart';
@@ -27,7 +24,7 @@ Scope getScope(Runtime runtime, AST node) {
 
 void multipleVariableDefinitionsError(int lineNum, String variableName) {
   print('[Line $lineNum] variable `$variableName` is already defined');
-  exit(1);
+  return null;
 }
 
 AST listAddFPtr(Runtime runtime, AST self, List args) {
@@ -43,7 +40,7 @@ AST listRemoveFptr(Runtime runtime, AST self, List args) {
 
   if (ast_int.intVal > self.listChildren.length) {
     print('Index out of range');
-    exit(1);
+    return null;
   }
 
   self.listChildren.remove(self.listChildren[ast_int.intVal]);
@@ -66,7 +63,7 @@ AST mapRemoveFptr(Runtime runtime, AST self, List args) {
 
   if (!self.map.containsKey(astString.stringValue)) {
     print('Map does not contain `${astString.stringValue}`');
-    exit(1);
+    return null;
   }
 
   self.map.remove(astString.stringValue);
@@ -109,7 +106,7 @@ Future<AST> runtimeFuncCall(Runtime runtime, AST fcall, AST fdef) async {
       'Error: [Line ${fcall.lineNum}] ${fdef.funcName} Expected ${fdef.funcDefArgs.length} arguments but found ${fcall.funcCallArgs.length} arguments\n',
     );
 
-    exit(1);
+    return null;
   }
 
   var funcDefBodyScope = fdef.funcDefBody.scope;
@@ -126,8 +123,7 @@ Future<AST> runtimeFuncCall(Runtime runtime, AST fcall, AST fdef) async {
 
     if (x > fdef.funcDefArgs.length - 1) {
       print('Error: [Line ${astArg.lineNum}] Too many arguments\n');
-      exit(1);
-      break;
+      return null;
     }
 
     AST astFDefArg = fdef.funcDefArgs[x];
@@ -296,7 +292,7 @@ Future<AST> visit(Runtime runtime, AST node) async {
       return await visitAssert(runtime, node);
     default:
       print('Uncaught statement ${node.type}');
-      exit(1);
+      return null;
   }
 }
 
@@ -427,7 +423,7 @@ Future<AST> visitVariable(Runtime runtime, AST node) async {
 
   print(
       'Error: [Line ${node.lineNum}] Undefined variable `${node.variableName}`.');
-  exit(1);
+  return null;
 }
 
 Future<AST> visitVarDef(Runtime runtime, AST node) async {
@@ -524,6 +520,7 @@ Future<AST> visitVarAssignment(Runtime runtime, AST node) async {
 
   print(
       "Error: [Line ${left.lineNum}] Can't set undefined variable ${left.variableName}");
+  return null;
 }
 
 Future<AST> visitVarMod(Runtime runtime, AST node) async {
@@ -615,13 +612,13 @@ Future<AST> visitVarMod(Runtime runtime, AST node) async {
         default:
           print(
               'Error: [Line ${node.lineNum}] `${node.binaryOperator.value}` is not a valid operator');
-          exit(1);
+          return null;
       }
     }
   }
   print(
       "Error: [Line ${node.lineNum}] Can't set undefined variable `${node.variableName}`");
-  exit(1);
+  return null;
 }
 
 Future<AST> visitFuncDef(Runtime runtime, AST node) async {
@@ -763,10 +760,9 @@ Future<AST> visitFuncCall(Runtime runtime, AST node) async {
   if (globalScopeFuncDef != null) return globalScopeFuncDef;
 
   print('Error: [Line ${node.lineNum}] Undefined method `?`');
-  exit(1);
+  return null;
 
   // To silence the analyzer
-  return null;
 }
 
 Future<AST> visitCompound(Runtime runtime, AST node) async {
@@ -920,7 +916,7 @@ Future<AST> visitListAccess(Runtime runtime, AST node) async {
     var key = ast.stringValue;
     if (left.type != ASTType.AST_MAP) {
       print('Error: [Line ${node.lineNum}] Expected a Map');
-      exit(1);
+      return null;
     }
 
     if (left.map.containsKey(key)) {
@@ -958,10 +954,10 @@ Future<AST> visitListAccess(Runtime runtime, AST node) async {
       print(
           'Error: Invalid list index: Valid range is: ${left.listChildren.isNotEmpty ? left.listChildren.length - 1 : 0}');
 
-      exit(1);
+      return null;
     }
     print('List Access left value is not iterable.');
-    exit(1);
+    return null;
   }
 }
 
@@ -1504,7 +1500,7 @@ Future<AST> visitBinaryOp(Runtime runtime, AST node) async {
     default:
       print(
           'Error: [Line ${node.lineNum}] `${node.binaryOperator.value}` is not a valid operator');
-      exit(1);
+      return null;
   }
 
   return node;
@@ -1543,7 +1539,7 @@ Future<AST> visitUnaryOp(Runtime runtime, AST node) async {
     default:
       print(
           'Error: [Line ${node.lineNum}] `${node.unaryOperator.value}` is not a valid operator');
-      exit(1);
+      return null;
   }
 
   return returnValue;
@@ -1552,7 +1548,6 @@ Future<AST> visitUnaryOp(Runtime runtime, AST node) async {
 Future<AST> visitIf(Runtime runtime, AST node) async {
   if (node.ifExpression == null) {
     print('Error: [Line ${node.lineNum}] If expression can\'t be empty');
-    exit(1);
     return null;
   }
 
@@ -1619,7 +1614,7 @@ Future<AST> visitIterate(Runtime runtime, AST node) async {
       if (fDef.funcName == node.iterateFunction.variableName) {
         if (fDef.fptr != null) {
           print('Error: Can not iterate with native method');
-          exit(1);
+          return null;
         }
 
         break;
@@ -1700,7 +1695,7 @@ Future<AST> visitAssert(Runtime runtime, AST node) async {
     }
 
     print('[Line ${node.lineNum}] Assert failed! $str');
-    exit(1);
+    return null;
   }
 
   return INITIALIZED_NOOP;
@@ -1710,7 +1705,7 @@ void runtimeExpectArgs(List inArgs, List<ASTType> args) {
   if (inArgs.length < args.length) {
     print(
         '${inArgs.length} argument(s) were provided, while ${args.length} were expected');
-    exit(1);
+    return null;
   }
 
   for (int i = 0; i < args.length; i++) {
@@ -1721,7 +1716,7 @@ void runtimeExpectArgs(List inArgs, List<ASTType> args) {
     if (ast.type != args[i]) {
       print('Received argument of type ${ast.type}, but expected ${args[i]}');
       print('Got unexpected arguments, terminating');
-      exit(1);
+      return null;
     }
   }
 }
@@ -1775,6 +1770,7 @@ Future<AST> visitStringProperties(AST node, AST left) async {
     default:
       print('Error: No property ${node.binaryOpRight.variableName} for String');
   }
+  return null;
 }
 
 Future<AST> visitStringMethods(AST node, AST left, Runtime runtime) async {
@@ -1852,9 +1848,10 @@ Future<AST> visitStringMethods(AST node, AST left, Runtime runtime) async {
     case 'input':
       {
         var str = left.stringValue;
-        await runtime.msg.reply(content: str);
+        await runtime.msg.reply(content: str, mention: false);
         var astString = initAST(ASTType.AST_STRING);
-        astString.stringValue = (await runtime.msg.client.onMessage.first).message.content;
+        astString.stringValue =
+            (await runtime.msg.client.onMessage.first).message.content;
 
         return astString;
       }
@@ -2072,4 +2069,5 @@ Future<AST> visitStringMethods(AST node, AST left, Runtime runtime) async {
     default:
       print('Error: No method ${node.binaryOpRight.variableName} for String');
   }
+  return null;
 }

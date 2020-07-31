@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'AST.dart';
 import 'data_type.dart';
@@ -39,20 +38,20 @@ Parser initParser(Lexer lexer) {
 /// Throws an error and exits
 void parserTypeError(Parser parser) {
   print('[Line ${parser.lexer.lineNum}] Invalid type');
-  exit(1);
+  return null;
 }
 
 /// Throws an error and exits
 void parserSyntaxError(Parser parser) {
   print('[Line ${parser.lexer.lineNum}] Syntax error');
-  exit(1);
+  return null;
 }
 
 /// Throws an error and exits
 void parserUnexpectedToken(Parser parser, TokenType type) {
   print(
       '[Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, was expecting `$type`');
-  exit(1);
+  return null;
 }
 
 /// Sets the ast to be a child of a class
@@ -179,7 +178,7 @@ AST parseStatement(Parser parser, Scope scope) {
       {
         print(
             '[Line ${parser.lexer.lineNum}] Expected token `${parser.curToken.value}`');
-        exit(1);
+        return null;
       }
       break;
 
@@ -465,19 +464,19 @@ AST parseMap(Parser parser, Scope scope) {
       else {
         print(
             'Error: [Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, expected `:`.');
-        exit(1);
+        return null;
       }
 
       if (parser.curToken.type == TokenType.TOKEN_COMMA) {
         print(
             'Error: [Line ${parser.lexer.lineNum}] Expected value for key `$key`');
-        exit(1);
+        return null;
       }
       ast.map[key] = parseExpression(parser, scope);
     } else {
       print(
           'Error: [Line ${parser.lexer.lineNum}] Maps can only hold strings as keys.');
-      exit(1);
+      return null;
     }
   }
 
@@ -492,13 +491,13 @@ AST parseMap(Parser parser, Scope scope) {
     else {
       print(
           'Error: [Line ${parser.lexer.lineNum}] Unexpected token `${parser.curToken.value}`, expected `:`.');
-      exit(1);
+      return null;
     }
 
     if (parser.curToken.type == TokenType.TOKEN_COMMA) {
       print(
           'Error: [Line ${parser.lexer.lineNum}] Expected value for key `$key`');
-      exit(1);
+      return null;
     }
     ast.map[key] = parseExpression(parser, scope);
   }
@@ -607,7 +606,7 @@ AST parseFactor(Parser parser, Scope scope, bool isMap) {
       return parseList(parser, scope);
     default:
       print('Unexpected ${parser.curToken.value}');
-      exit(1);
+      return null;
       break;
   }
 }

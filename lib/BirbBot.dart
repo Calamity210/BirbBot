@@ -19,6 +19,7 @@ void main() {
       if (msg.message.content.startsWith('>birb')) {
         var content = msg.message.content.replaceFirst('>birb ', '');
         if (content.startsWith('```birb')) {
+
           final program =
               content.replaceAll('```birb', '').replaceAll('```', '');
           var lexer = initLexer(program);
@@ -26,6 +27,7 @@ void main() {
           var runtime = initRuntime(msg.message);
           var node = parse(parser);
           await visit(runtime, node);
+
         } else {
           final em = EmbedBuilder()
             ..color = DiscordColor.red
@@ -41,7 +43,7 @@ void main() {
     \`\`\`
     ''';
 
-          await msg.message.reply(embed: em);
+          await msg.message.reply(embed: em, mention: false);
         }
       }
     });

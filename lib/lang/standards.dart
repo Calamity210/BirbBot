@@ -60,11 +60,11 @@ Future<AST> funcScrem(Runtime runtime, AST self, List args) async {
     var str = astToString(astArg);
 
     if (str == null) {
-      await globalMsg.reply(content: 'Screm must contain non-null arguments');
-      exit(1);
+      await globalMsg.reply(content: 'Screm must contain non-null arguments', mention: false);
+      return null;
     }
 
-    await globalMsg.reply(content: str);
+    await globalMsg.reply(content: str, mention: false);
   }
 
   return INITIALIZED_NOOP;
@@ -120,8 +120,8 @@ AST funcFileOpen(Runtime runtime, AST self, List args) {
       mode = FileMode.writeOnlyAppend;
       break;
     default:
-      print('No mode `${(args[1] as AST).stringValue}` found');
-      exit(1);
+      globalMsg.reply(mention: false, content:'No mode `${(args[1] as AST).stringValue}` found');
+      return null;
   }
 
   File f = File(filename);
@@ -544,6 +544,7 @@ AST funcEncodeJson(Runtime runtime, AST self, List args) {
       case ASTType.AST_MAP:
         jsonMap[key] = val.map;
         break;
+      default: break;
     }
     return;
   });

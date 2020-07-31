@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'token.dart';
 
@@ -217,7 +216,7 @@ Token getNextToken(Lexer lexer) {
         return advanceWithToken(lexer, TokenType.TOKEN_COLON);
       default:
         print('[Line ${lexer.lineNum}] Unexpected ${lexer.currentChar}');
-        exit(1);
+        return null;
         break;
     }
   }
@@ -254,7 +253,7 @@ void expect(Lexer lexer, String c) {
   if (lexer.currentChar != c) {
     print(
         'Error: [Line ${lexer.lineNum}] Lexer expected the current char to be `$c`, but it was `${lexer.currentChar}`.');
-    exit(1);
+    return null;
   }
 }
 
@@ -302,7 +301,7 @@ Token collectString(Lexer lexer) {
   while (lexer.currentChar != '"') {
     if (lexer.currentIndex == lexer.contents.length - 1) {
       print('[Line ${lexer.lineNum}] Missing closing `"`');
-      exit(1);
+      return null;
     }
 
     advance(lexer);
@@ -328,7 +327,7 @@ Token collectSingleQuoteString(Lexer lexer) {
   while (lexer.currentChar != '\'') {
     if (lexer.currentIndex == lexer.contents.length - 1) {
       print('[Line ${lexer.lineNum}] Missing closing `\'`');
-      exit(1);
+      return null;
     }
 
     advance(lexer);
