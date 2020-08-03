@@ -1,11 +1,12 @@
+import 'dart:async';
+
+import 'package:Birb/utils/lexer.dart';
+import 'package:Birb/utils/parser.dart';
+import 'package:Birb/utils/runtime.dart';
 import 'package:BirbBot/keys.dart';
-import 'package:BirbBot/lang/lexer.dart';
-import 'package:BirbBot/lang/parser.dart';
 import 'package:nyxx/Vm.dart';
 import 'package:nyxx/commands.dart';
 import 'package:nyxx/nyxx.dart';
-
-import 'lang/runtime.dart';
 
 void main() {
   configureNyxxForVM();
@@ -22,11 +23,17 @@ void main() {
 
           final program =
               content.replaceAll('```birb', '').replaceAll('```', '');
-          var lexer = initLexer(program);
-          var parser = initParser(lexer);
-          var runtime = initRuntime(msg.message);
-          var node = parse(parser);
-          await visit(runtime, node);
+
+          await runZoned(() async {
+            var lexer = initLexer(program);
+            var parser = initParser(lexer);
+            var runtime = initRuntime();
+            var node = parse(parser);
+            await visit(runtime, node);
+          }, zoneSpecification: ZoneSpecification(
+              print: (Zone self, ZoneDelegate parent, Zone zone, String line) {
+                msg.message.reply(mention: false, content: line);
+              }));
 
         } else {
           final em = EmbedBuilder()
