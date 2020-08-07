@@ -5,7 +5,7 @@
         <entry key="Birb">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/git/BirbLang-61d1a2546a0dfe394050e77bc084ea02c4af8c8a/lib" />
+              <option value="$USER_HOME$/.pub-cache/git/BirbLang-d8bb912f0fd51f5e0cf126414ebb8ee885081ca1/lib" />
             </list>
           </value>
         </entry>
@@ -19,7 +19,7 @@
         <entry key="analyzer">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/analyzer-0.39.15/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/analyzer-0.39.16/lib" />
             </list>
           </value>
         </entry>
@@ -432,7 +432,7 @@
         <entry key="vm_service">
           <value>
             <list>
-              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/vm_service-4.1.0/lib" />
+              <option value="$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/vm_service-4.2.0/lib" />
             </list>
           </value>
         </entry>
@@ -481,10 +481,10 @@
       </option>
     </properties>
     <CLASSES>
-      <root url="file://$USER_HOME$/.pub-cache/git/BirbLang-61d1a2546a0dfe394050e77bc084ea02c4af8c8a/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/git/BirbLang-d8bb912f0fd51f5e0cf126414ebb8ee885081ca1/lib" />
       <root url="file://$USER_HOME$/.pub-cache/git/sockjs-dart-client-2e8dc8d2fe8486d31b6e220277c94d746ced1691/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/_fe_analyzer_shared-6.0.0/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/analyzer-0.39.15/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/analyzer-0.39.16/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/args-1.6.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/async-2.4.2/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/boolean_selector-2.0.0/lib" />
@@ -542,7 +542,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/test_process-1.0.5/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/tuple-1.0.3/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/typed_data-1.2.0/lib" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/vm_service-4.1.0/lib" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/vm_service-4.2.0/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/w_common-1.20.3/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/w_transport-3.2.8/lib" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dartlang.org/watcher-0.9.7+15/lib" />

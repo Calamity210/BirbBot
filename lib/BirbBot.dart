@@ -32,11 +32,11 @@ void main() {
               var node = parse(parser);
               await visit(runtime, node);
             } catch (e) {
-              print(e.toString());
+              await msg.message.reply(mention: false, content:e.toString());
             }
           }, zoneSpecification: ZoneSpecification(
-              print: (Zone self, ZoneDelegate parent, Zone zone, String line) {
-                msg.message.reply(mention: false, content: line);
+              print: (Zone self, ZoneDelegate parent, Zone zone, String line) async {
+                await msg.message.reply(mention: false, content: line);
               }));
 
         } else {
