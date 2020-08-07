@@ -25,11 +25,15 @@ void main() {
               content.replaceAll('```birb', '').replaceAll('```', '');
 
           await runZoned(() async {
-            var lexer = initLexer(program);
-            var parser = initParser(lexer);
-            var runtime = initRuntime();
-            var node = parse(parser);
-            await visit(runtime, node);
+            try {
+              var lexer = initLexer(program);
+              var parser = initParser(lexer);
+              var runtime = initRuntime();
+              var node = parse(parser);
+              await visit(runtime, node);
+            } catch (e) {
+              print(e.toString());
+            }
           }, zoneSpecification: ZoneSpecification(
               print: (Zone self, ZoneDelegate parent, Zone zone, String line) {
                 msg.message.reply(mention: false, content: line);
