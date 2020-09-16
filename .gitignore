@@ -9,3 +9,7 @@ build/
 doc/api/
 
 lib/keys.dart
+
+# IDE
+.idea/
+.vscode/
