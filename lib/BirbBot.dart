@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
-import 'package:Birb/utils/lexer.dart';
-import 'package:Birb/utils/parser.dart';
-import 'package:Birb/utils/runtime.dart';
+import 'package:Birb/lexer/lexer.dart';
+import 'package:Birb/parser/parser.dart';
+import 'package:Birb/runtime/runtime.dart';
 import 'package:BirbBot/keys.dart';
 import 'package:nyxx/Vm.dart';
 import 'package:nyxx/nyxx.dart';
@@ -37,7 +38,7 @@ Future<void> runBirb(MessageEvent msg) async {
       try {
         var lexer = initLexer(program);
         var parser = initParser(lexer);
-        var runtime = initRuntime();
+        var runtime = initRuntime(null);
         var node = parse(parser);
         await visit(runtime, node);
       } catch (e) {

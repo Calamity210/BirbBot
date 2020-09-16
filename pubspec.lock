@@ -6,7 +6,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "6b04e28ac2be28b72ee45dc9c527d1f3ebc74bd1"
+      resolved-ref: "69dc5639dd3f42f273a5dfa25f1ac374dc2ccee3"
       url: "https://github.com/Calamity210/BirbLang"
     source: git
     version: "0.0.1"
@@ -93,7 +93,7 @@ packages:
       name: coverage
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.14.0"
+    version: "0.14.1"
   crypto:
     dependency: transitive
     description:
@@ -198,7 +198,7 @@ packages:
       name: meta
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.2"
+    version: "1.2.3"
   mime:
     dependency: transitive
     description:
