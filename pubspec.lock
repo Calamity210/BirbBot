@@ -6,7 +6,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "69dc5639dd3f42f273a5dfa25f1ac374dc2ccee3"
+      resolved-ref: b1aadb0dc63a5dcd56f59f11f6bf5b5885085f8a
       url: "https://github.com/Calamity210/BirbLang"
     source: git
     version: "0.0.1"
@@ -16,14 +16,14 @@ packages:
       name: _fe_analyzer_shared
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "7.0.0"
+    version: "9.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.39.17"
+    version: "0.40.2"
   args:
     dependency: transitive
     description:
@@ -101,13 +101,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.5"
-  csslib:
-    dependency: transitive
-    description:
-      name: csslib
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.16.2"
   dart2_constant:
     dependency: transitive
     description:
@@ -129,13 +122,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.0"
-  html:
-    dependency: transitive
-    description:
-      name: html
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.14.0+3"
   http:
     dependency: "direct main"
     description:
@@ -291,7 +277,7 @@ packages:
       name: sass
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.26.10"
+    version: "1.26.11"
   shelf:
     dependency: transitive
     description:
@@ -398,7 +384,7 @@ packages:
       name: test
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.15.3"
+    version: "1.15.4"
   test_api:
     dependency: transitive
     description:
@@ -412,7 +398,7 @@ packages:
       name: test_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.11"
+    version: "0.3.11+1"
   test_process:
     dependency: transitive
     description:

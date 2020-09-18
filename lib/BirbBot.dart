@@ -19,20 +19,23 @@ void main() {
     print('Birb bot ready to screm!');
 
     bot.onMessage.listen((msg) async {
-      if (msg.message.content.startsWith('>birb')) {
-        await runBirb(msg);
-      } else if (RegExp('>(.+)<').hasMatch(msg.message.content)) {
-        await getBirbDocs(
-            msg, RegExp('>(.+)<').firstMatch(msg.message.content).group(1));
+      if (msg.message?.content != null && msg.message.content.startsWith('>birb')) {
+        try {
+          await runBirb(msg);
+        } catch (e) {
+          await msg.message.reply(content: 'Birb ran into an error, please try again.');
+        }
       }
+
+      // TODO(CALAMITY): Implement docs search using Algolia
     });
   });
 }
 
 Future<void> runBirb(MessageEvent msg) async {
   var content = msg.message.content.replaceFirst(RegExp(r'>birb[\s]+'), '');
-  if (content.startsWith('```birb')) {
-    final program = content.replaceAll('```birb', '').replaceAll('```', '');
+  if (content.startsWith('```')) {
+    final program = content.replaceAll('```', '');
 
     await runZoned(() async {
       try {
@@ -44,16 +47,14 @@ Future<void> runBirb(MessageEvent msg) async {
       } catch (e) {
         await msg.message.reply(mention: false, content: e.toString());
       }
-    }, zoneSpecification: ZoneSpecification(
-        print: (Zone self, ZoneDelegate parent, Zone zone, String line) async {
+    }, zoneSpecification: ZoneSpecification(print: (Zone self, ZoneDelegate parent, Zone zone, String line) async {
       await msg.message.reply(mention: false, content: line);
     }));
   } else {
     final em = EmbedBuilder()
       ..color = DiscordColor.red
       ..title = 'Incorrect program format'
-      ..description =
-          '''To run a birb program, the program must be formatted as the following: 
+      ..description = '''To run a birb program, the program must be formatted as the following: 
     \\`\\`\\`birb
       Code goes here
     \\`\\`\\`
@@ -67,10 +68,9 @@ Future<void> runBirb(MessageEvent msg) async {
   }
 }
 
+// TODO(CALAMITY):Reimplement using Algolia
 Future<void> getBirbDocs(MessageEvent msg, String arg) async {
-  final response =
-      (await http.get('https://gc.spidev.codes/assets/js/search-data.json'))
-          .body;
+  final response = (await http.get('https://gc.spidev.codes/assets/js/search-data.json')).body;
   var json = jsonDecode(response);
   var results = {};
   List splitArg = arg.split('${arg[arg.length ~/ 2]}');
@@ -81,16 +81,14 @@ Future<void> getBirbDocs(MessageEvent msg, String arg) async {
       results[arg] = data['url'];
     else if (data['content'].contains(arg))
       results[data['title']] = data['url'];
-    else if (wildMatch.hasMatch(data['title']) ||
-        wildMatch.hasMatch(data['content']))
+    else if (wildMatch.hasMatch(data['title']) || wildMatch.hasMatch(data['content']))
       results[data['title']] = data['url'];
   });
 
   var embedBuilder = EmbedBuilder()
     ..color = DiscordColor.springGreen
     ..title = 'Found ${results.length} results for `$arg`';
-  results.forEach((title, url) => embedBuilder.addField(
-      name: title, content: 'https://gc.spidev.codes/$url'));
+  results.forEach((title, url) => embedBuilder.addField(name: title, content: 'https://gc.spidev.codes/$url'));
 
   await msg.message.reply(mention: false, embed: embedBuilder);
 }
