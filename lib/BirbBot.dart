@@ -48,7 +48,11 @@ Future<void> runBirb(MessageEvent msg) async {
         await msg.message.reply(mention: false, content: e.toString());
       }
     }, zoneSpecification: ZoneSpecification(print: (Zone self, ZoneDelegate parent, Zone zone, String line) async {
-      await msg.message.reply(mention: false, content: line);
+      try {
+        await msg.message.reply(mention: false, content: line);
+      } catch (e) {
+        await msg.message.reply(mention: false, content: 'Birb ran into an error, try again');
+      }
     }));
   } else {
     final em = EmbedBuilder()
