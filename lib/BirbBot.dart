@@ -25,12 +25,7 @@ void main() {
         } catch (e) {
           await msg.message.channel.send(content: 'Birb ran into an error, please try again.');
         }
-      } else if (msg.message?.content != null && msg.message.content.startsWith('>new')) {
-        try {
-          await Process.start('dart', ['lib/BirbBot.dart']);
-        } catch (e) {
-          await msg.message.channel.send(content: 'Birb ran into an error, please try again.');
-        }
+      } else if (msg.message?.content != null && msg.message.content.startsWith('>exit')) {
         exit(0);
       } else if (RegExp('>(.+)<').hasMatch(msg.message.content)) {
         await getBirbDocs(msg, RegExp('>(.+)<').firstMatch(msg.message.content).group(1));
@@ -67,11 +62,11 @@ Future<void> runBirb(MessageReceivedEvent msg) async {
       ..title = 'Incorrect program format'
       ..description = '''
       To run a birb program, the program must be formatted as the following: 
-    \\`\\`\\`birb
+    \\`\\`\\`
       Code goes here
     \\`\\`\\`
     Which should in turn look like:
-    \`\`\`birb
+    \`\`\`
       Code goes here
     \`\`\`
     ''';
