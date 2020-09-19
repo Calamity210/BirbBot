@@ -13,52 +13,60 @@ import 'package:http/http.dart' as http;
 void main() {
   configureNyxxForVM();
 
-  var bot = Nyxx(BOT_TOKEN, ignoreExceptions: false);
+  final bot = Nyxx(BOT_TOKEN, ignoreExceptions: false);
 
   bot.onReady.listen((event) {
     print('Birb bot ready to screm!');
 
-    bot.onMessage.listen((msg) async {
+    bot.onMessageReceived.listen((msg) async {
       if (msg.message?.content != null && msg.message.content.startsWith('>birb')) {
         try {
           await runBirb(msg);
         } catch (e) {
-          await msg.message.reply(content: 'Birb ran into an error, please try again.');
+          await msg.message.channel.send(content: 'Birb ran into an error, please try again.');
         }
+      } else if (msg.message?.content != null && msg.message.content.startsWith('>new')) {
+        try {
+          await Process.start('dart', ['lib/BirbBot.dart']);
+        } catch (e) {
+          await msg.message.channel.send(content: 'Birb ran into an error, please try again.');
+        }
+        exit(0);
+      } else if (RegExp('>(.+)<').hasMatch(msg.message.content)) {
+        await getBirbDocs(msg, RegExp('>(.+)<').firstMatch(msg.message.content).group(1));
       }
-
-      // TODO(CALAMITY): Implement docs search using Algolia
     });
   });
 }
 
-Future<void> runBirb(MessageEvent msg) async {
-  var content = msg.message.content.replaceFirst(RegExp(r'>birb[\s]+'), '');
+Future<void> runBirb(MessageReceivedEvent msg) async {
+  final content = msg.message.content.replaceFirst(RegExp(r'>birb[\s]+'), '');
   if (content.startsWith('```')) {
     final program = content.replaceAll('```', '');
 
     await runZoned(() async {
       try {
-        var lexer = initLexer(program);
-        var parser = initParser(lexer);
-        var runtime = initRuntime(null);
-        var node = parse(parser);
+        final lexer = initLexer(program);
+        final parser = initParser(lexer);
+        final runtime = initRuntime(null);
+        final node = parse(parser);
         await visit(runtime, node);
       } catch (e) {
-        await msg.message.reply(mention: false, content: e.toString());
+        await msg.message.channel.send(content: e.toString());
       }
     }, zoneSpecification: ZoneSpecification(print: (Zone self, ZoneDelegate parent, Zone zone, String line) async {
       try {
-        await msg.message.reply(mention: false, content: line);
+        await msg.message.channel.send(content: line);
       } catch (e) {
-        await msg.message.reply(mention: false, content: 'Birb ran into an error, try again');
+        await msg.message.channel.send(content: 'Birb ran into an error, try again');
       }
     }));
   } else {
     final em = EmbedBuilder()
       ..color = DiscordColor.red
       ..title = 'Incorrect program format'
-      ..description = '''To run a birb program, the program must be formatted as the following: 
+      ..description = '''
+      To run a birb program, the program must be formatted as the following: 
     \\`\\`\\`birb
       Code goes here
     \\`\\`\\`
@@ -68,31 +76,33 @@ Future<void> runBirb(MessageEvent msg) async {
     \`\`\`
     ''';
 
-    await msg.message.reply(embed: em, mention: false);
+    await msg.message.channel.send(embed: em);
   }
 }
 
-// TODO(CALAMITY):Reimplement using Algolia
-Future<void> getBirbDocs(MessageEvent msg, String arg) async {
-  final response = (await http.get('https://gc.spidev.codes/assets/js/search-data.json')).body;
-  var json = jsonDecode(response);
-  var results = {};
-  List splitArg = arg.split('${arg[arg.length ~/ 2]}');
+Future<void> getBirbDocs(MessageReceivedEvent msg, String arg) async {
+  final response = (await http.get('https://birbolang.web.app/search-index.json')).body;
+  final json = jsonDecode(response);
+  final results = {};
+  final List splitArg = arg.split('${arg[arg.length ~/ 2]}');
   final wildMatch = RegExp('${splitArg[0]}\w+|${splitArg[1]}\w+');
 
-  json.values.forEach((data) {
-    if (data['title'] == arg)
-      results[arg] = data['url'];
-    else if (data['content'].contains(arg))
-      results[data['title']] = data['url'];
-    else if (wildMatch.hasMatch(data['title']) || wildMatch.hasMatch(data['content']))
-      results[data['title']] = data['url'];
+  json['documents'].where((data) => data['pageTitle'] == arg).forEach((data) {
+      results[arg] = data['sectionRoute'];
   });
 
-  var embedBuilder = EmbedBuilder()
+  json['documents'].where((data) => data['sectionTitle'].contains(arg) == true).forEach((data) {
+    results[data['pageTitle']] = data['sectionRoute'];
+  });
+
+  json['documents'].where((data) => wildMatch.hasMatch(data['pageTitle']) || wildMatch.hasMatch(data['sectionTitle'])).forEach((data) {
+    results[data['pageTitle']] = data['sectionRoute'];
+  });
+
+  final embedBuilder = EmbedBuilder()
     ..color = DiscordColor.springGreen
     ..title = 'Found ${results.length} results for `$arg`';
-  results.forEach((title, url) => embedBuilder.addField(name: title, content: 'https://gc.spidev.codes/$url'));
+  results.forEach((title, url) => embedBuilder.addField(name: title, content: 'https://birbolang.web.app/$url'));
 
-  await msg.message.reply(mention: false, embed: embedBuilder);
+  await msg.message.channel.send(embed: embedBuilder);
 }
