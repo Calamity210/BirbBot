@@ -26,8 +26,17 @@ void main() {
           await msg.message.channel.send(content: 'Birb ran into an error, please try again.');
         }
       } else if (msg.message?.content != null && msg.message.content.startsWith('>update')) {
-        await msg.message.channel.send(content: 'Updating...');
-        exit(0);
+        final sw = Stopwatch()..start();
+        final mesg = await msg.message.channel.send(content: 'Updating...');
+        try {
+          await Process.start('pub', ['upgrade'], runInShell: true);
+          sw.start();
+          await mesg.edit(content: 'Update completed successfully in ${sw.elapsedTicks}s');
+          exit(0);
+        } catch (e) {
+          sw.stop();
+          await mesg.edit(content: 'Update failed in ${sw.elapsedMilliseconds}s');
+        }
       } else if (RegExp('>(.+)<').hasMatch(msg.message.content)) {
         await getBirbDocs(msg, RegExp('>(.+)<').firstMatch(msg.message.content).group(1));
       }
