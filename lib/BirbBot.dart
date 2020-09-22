@@ -97,7 +97,7 @@ Future<void> getBirbDocs(MessageReceivedEvent msg, String arg) async {
   final embedBuilder = EmbedBuilder()
     ..color = DiscordColor.springGreen
     ..title = 'Found ${results.length} results for `$arg`';
-  results.forEach((title, url) => embedBuilder.addField(name: title, content: 'https://birbolang.web.app/$url'));
+  results.forEach((title, url) => embedBuilder.addField(name: title, content: 'https://birbolang.web.app$url'));
 
   await msg.message.channel.send(embed: embedBuilder);
 }
