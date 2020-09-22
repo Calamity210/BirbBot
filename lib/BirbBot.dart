@@ -25,7 +25,8 @@ void main() {
         } catch (e) {
           await msg.message.channel.send(content: 'Birb ran into an error, please try again.');
         }
-      } else if (msg.message?.content != null && msg.message.content.startsWith('>exit')) {
+      } else if (msg.message?.content != null && msg.message.content.startsWith('>update')) {
+        await msg.message.channel.send(content: 'Updating...');
         exit(0);
       } else if (RegExp('>(.+)<').hasMatch(msg.message.content)) {
         await getBirbDocs(msg, RegExp('>(.+)<').firstMatch(msg.message.content).group(1));
