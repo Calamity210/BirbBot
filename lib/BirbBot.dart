@@ -29,13 +29,15 @@ void main() {
         final sw = Stopwatch()..start();
         final mesg = await msg.message.channel.send(content: 'Updating...');
         try {
-          await Process.start('pub', ['upgrade'], runInShell: true);
-          sw.start();
-          await mesg.edit(content: 'Update completed successfully in ${sw.elapsedTicks}s');
+          await Process.start('pub', ['upgrade'], runInShell: true)..stderr.listen((e) async{
+            await mesg.edit(content: 'Update failed in ${sw.elapsedMilliseconds / 1000}s');
+          });
+          sw.stop();
+          await mesg.edit(content: 'Update completed successfully in ${sw.elapsedMilliseconds / 1000}s');
           exit(0);
         } catch (e) {
           sw.stop();
-          await mesg.edit(content: 'Update failed in ${sw.elapsedMilliseconds}s');
+          await mesg.edit(content: 'Update failed in ${sw.elapsedMilliseconds / 1000}s');
         }
       } else if (RegExp('>(.+)<').hasMatch(msg.message.content)) {
         await getBirbDocs(msg, RegExp('>(.+)<').firstMatch(msg.message.content).group(1));
