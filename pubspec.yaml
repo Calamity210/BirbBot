@@ -1,4 +1,3 @@
----
 name: BirbBot
 description: A sample command-line application.
 environment:
@@ -11,6 +10,7 @@ dependencies:
     git:
       url: https://github.com/Calamity210/BirbLang
   http: ^0.12.2
+  fuzzy: ^0.3.0
 dev_dependencies:
   dart_style:
   analyzer:

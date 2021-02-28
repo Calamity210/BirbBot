@@ -9,6 +9,7 @@ import 'package:BirbBot/keys.dart';
 import 'package:nyxx/Vm.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:http/http.dart' as http;
+import 'package:fuzzy/fuzzy.dart';
 
 void main() {
   configureNyxxForVM();
@@ -19,36 +20,46 @@ void main() {
     print('Birb bot ready to screm!');
 
     bot.onMessageReceived.listen((msg) async {
-      if (msg.message?.content != null && msg.message.content.startsWith('>birb')) {
+      if (msg.message?.content != null &&
+          msg.message.content.startsWith('>birb')) {
         try {
           await runBirb(msg);
         } catch (e) {
-          await msg.message.channel.send(content: 'Birb ran into an error, please try again.');
+          await msg.message.channel
+              .send(content: 'Birb ran into an error, please try again.');
         }
-      } else if (msg.message?.content != null && msg.message.content.startsWith('>update')) {
+      } else if (msg.message?.content != null &&
+          msg.message.content.startsWith('>update')) {
         final sw = Stopwatch()..start();
         final mesg = await msg.message.channel.send(content: 'Updating...');
         try {
-          await Process.start('pub', ['upgrade'], runInShell: true)..stderr.listen((e) async{
-            await mesg.edit(content: 'Update failed in ${sw.elapsedMilliseconds / 1000}s');
-          });
+          await Process.start('pub', ['upgrade'], runInShell: true)
+            ..stderr.listen((e) async {
+              await mesg.edit(
+                  content:
+                      'Update failed in ${sw.elapsedMilliseconds / 1000}s');
+            });
           sw.stop();
-          await mesg.edit(content: 'Update completed successfully in ${sw.elapsedMilliseconds / 1000}s');
+          await mesg.edit(
+              content:
+                  'Update completed successfully in ${sw.elapsedMilliseconds / 1000}s');
           exit(0);
         } catch (e) {
           sw.stop();
-          await mesg.edit(content: 'Update failed in ${sw.elapsedMilliseconds / 1000}s');
+          await mesg.edit(
+              content: 'Update failed in ${sw.elapsedMilliseconds / 1000}s');
         }
-      } else if (RegExp('>(.+)<').hasMatch(msg.message.content)) {
-        await getBirbDocs(msg, RegExp('>(.+)<').firstMatch(msg.message.content).group(1));
+      } else if (RegExp(r'>\[(.+)\]').hasMatch(msg.message.content)) {
+        await getBirbDocs(msg,
+            RegExp(r'>\[(.+)\]').firstMatch(msg.message.content).group(1));
       }
     });
   });
 }
 
 Future<void> runBirb(MessageReceivedEvent msg) async {
-  final content = msg.message.content.replaceFirst(RegExp(r'>birb[\s]+'), '');
-  if (content.startsWith('```')) {
+  final content = msg.message.content.replaceFirst(RegExp(r'>birb\s+'), '');
+  if (content.startsWith('```\s')) {
     final program = content.replaceAll('```', '');
 
     await runZoned(() async {
@@ -61,11 +72,13 @@ Future<void> runBirb(MessageReceivedEvent msg) async {
       } catch (e) {
         await msg.message.channel.send(content: e.toString());
       }
-    }, zoneSpecification: ZoneSpecification(print: (Zone self, ZoneDelegate parent, Zone zone, String line) async {
+    }, zoneSpecification: ZoneSpecification(
+        print: (Zone self, ZoneDelegate parent, Zone zone, String line) async {
       try {
         await msg.message.channel.send(content: line);
       } catch (e) {
-        await msg.message.channel.send(content: 'Birb ran into an error, try again');
+        await msg.message.channel
+            .send(content: 'Birb ran into an error, try again');
       }
     }));
   } else {
@@ -88,28 +101,28 @@ Future<void> runBirb(MessageReceivedEvent msg) async {
 }
 
 Future<void> getBirbDocs(MessageReceivedEvent msg, String arg) async {
-  final response = (await http.get('https://birbolang.web.app/search-index.json')).body;
+  final response =
+      (await http.get('https://birbolang.web.app/search-index.json')).body;
   final json = jsonDecode(response);
+
+  final List documents = json['documents'];
+
+  final fuse = Fuzzy(documents.map((e) => e['sectionTitle']).toList());
+  final search = fuse.search(arg);
   final results = {};
-  final List splitArg = arg.split('${arg[arg.length ~/ 2]}');
-  final wildMatch = RegExp('${splitArg[0]}\w+|${splitArg[1]}\w+');
 
-  json['documents'].where((data) => data['pageTitle'] == arg).forEach((data) {
-      results[arg] = data['sectionRoute'];
-  });
+  search.forEach((e) {
+    final map =
+        documents.firstWhere((d) => d['sectionTitle'] == e.matches.first.value);
 
-  json['documents'].where((data) => data['sectionTitle'].contains(arg) == true).forEach((data) {
-    results[data['pageTitle']] = data['sectionRoute'];
-  });
-
-  json['documents'].where((data) => wildMatch.hasMatch(data['pageTitle']) || wildMatch.hasMatch(data['sectionTitle'])).forEach((data) {
-    results[data['pageTitle']] = data['sectionRoute'];
+    results[map['sectionTitle']] = map['sectionRoute'];
   });
 
   final embedBuilder = EmbedBuilder()
     ..color = DiscordColor.springGreen
     ..title = 'Found ${results.length} results for `$arg`';
-  results.forEach((title, url) => embedBuilder.addField(name: title, content: 'https://birbolang.web.app$url'));
+  results.forEach((title, url) => embedBuilder.addField(
+      name: title, content: 'https://birbolang.web.app$url'));
 
   await msg.message.channel.send(embed: embedBuilder);
 }
